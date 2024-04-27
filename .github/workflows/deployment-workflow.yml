@@ -35,4 +35,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: echo "これビルドするよ～ ${{ matrix.project }}"
+        if: ${{ hashFiles('package.json') != '' }}
         working-directory: ${{ matrix.project }}
+      - run: echo "デプロイするよ～ ${{ matrix.project }}"
