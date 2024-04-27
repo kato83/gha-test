@@ -1,4 +1,4 @@
-name: Dynamic Workflow
+name: Deployment Workflow
 on:
   workflow_dispatch:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  dynamic-changes:
+  changes:
     environment:
       name: debug
     outputs:
@@ -24,20 +24,20 @@ jobs:
         env:
           changed: ${{ steps.filter.outputs.changed_files }}
         run: |
-          projects="$( echo $changed | jq -r '.[]' | cut -d'/' -f2 | sort | uniq | jq -s -R -c 'split("\n") | map(select(. != ""))' )"
+          projects="$( echo $changed | jq -r '.[]' | cut -d'/' -f1,2 | sort | uniq | jq -s -R -c 'split("\n") | map(select(. != ""))' )"
           echo "projects=${projects}" >> $GITHUB_OUTPUT
 
-  dynamic-build:
+  build:
     environment:
       name: debug
-    needs: dynamic-changes
-    if: needs.dynamic-changes.outputs.projects != '[]'
+    needs: changes
+    if: needs.changes.outputs.projects != '[]'
     strategy:
       matrix:
-        project: ${{ fromJSON(needs.dynamic-changes.outputs.projects) }}
+        project: ${{ fromJSON(needs.changes.outputs.projects) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: echo "Building ${{ matrix.project }}"
-      - run: echo "BUILD"
-        working-directory: lambda/${{ matrix.project }}
+      - run: echo "BUILDするよ～"
+        working-directory: ${{ matrix.project }}
