@@ -1,0 +1,40 @@
+name: Dynamic Workflow
+on:
+  workflow_dispatch:
+
+jobs:
+  dynamic-changes:
+    environment:
+      name: debug
+    outputs:
+      projects: ${{ steps.changes.outputs.projects }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          list-files: json
+          filters: |
+            changed: 'lambda/*/**'
+      - id: changes
+        env:
+          changed: ${{steps.filter.outputs.changed_files}}
+        run: |
+          projects="$( echo $changed | jq -r '.[]' | cut -d'/' -f1 | sort | uniq | jq -s -R -c 'split("\n") | map(select(. != ""))' )"
+          echo "projects=${projects}" >> $GITHUB_OUTPUT
+
+  dynamic-build:
+    environment:
+      name: debug
+    needs: dynamic-changes
+    if: needs.dynamic-changes.outputs.projects != '[]'
+    strategy:
+      matrix:
+        project: ${{ fromJSON(needs.dynamic-changes.outputs.projects) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Building ${{ matrix.project }}"
+      - run: pwd
+        working-directory: ${{ matrix.project }}
