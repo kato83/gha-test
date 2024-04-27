@@ -7,8 +7,6 @@ on:
 
 jobs:
   changes:
-    environment:
-      name: debug
     outputs:
       projects: ${{ steps.changes.outputs.projects }}
     runs-on: ubuntu-latest
@@ -28,8 +26,6 @@ jobs:
           echo "projects=${projects}" >> $GITHUB_OUTPUT
 
   build:
-    environment:
-      name: debug
     needs: changes
     if: needs.changes.outputs.projects != '[]'
     strategy:
@@ -38,6 +34,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "Building ${{ matrix.project }}"
-      - run: echo "BUILDするよ～"
+      - run: echo "これビルドするよ～ ${{ matrix.project }}"
         working-directory: ${{ matrix.project }}
