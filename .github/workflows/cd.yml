@@ -23,6 +23,7 @@ jobs:
         run: |
           projects="$( echo $changed | jq -r '.[]' | cut -d'/' -f2 | sort | uniq | jq -s -R -c 'split("\n") | map(select(. != ""))' )"
           echo "projects=${projects}" >> $GITHUB_OUTPUT
+          echo $GITHUB_OUTPUT
 
   dynamic-build:
     environment:
