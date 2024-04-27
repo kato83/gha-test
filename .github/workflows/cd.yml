@@ -38,4 +38,4 @@ jobs:
       - uses: actions/checkout@v4
       - run: echo "Building ${{ matrix.project }}"
       - run: echo "BUILD"
-        working-directory: ${{ matrix.project }}
+        working-directory: lambda/${{ matrix.project }}
