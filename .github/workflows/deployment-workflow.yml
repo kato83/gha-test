@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "これビルドするよ～ ${{ matrix.project }} と ${{ hashFiles('package.json') }}"
-        if: ${{ hashFiles('package.json') != '' }}
+      - run: echo "これビルドするよ～ ${{ matrix.project }}"
+        if: ${{ hashFiles(format('{0}{1}', matrix.project, '/package.json')) != '' }}
         working-directory: ${{ matrix.project }}
       - run: echo "デプロイするよ～ ${{ matrix.project }}"
