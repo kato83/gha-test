@@ -8,7 +8,7 @@ on:
 jobs:
   changes:
     outputs:
-      projects: ${{ steps.changes.outputs.projects }}
+      functions: ${{ steps.changes.outputs.functions }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,19 +22,19 @@ jobs:
         env:
           changed: ${{ steps.filter.outputs.changed_files }}
         run: |
-          projects="$( echo $changed | jq -r '.[]' | cut -d'/' -f1,2 | sort | uniq | jq -s -R -c 'split("\n") | map(select(. != ""))' )"
-          echo "projects=${projects}" >> $GITHUB_OUTPUT
+          functions="$( echo $changed | jq -r '.[]' | cut -d'/' -f1,2 | sort | uniq | jq -s -R -c 'split("\n") | map(select(. != ""))' )"
+          echo "functions=${functions}" >> $GITHUB_OUTPUT
 
   build:
     needs: changes
-    if: needs.changes.outputs.projects != '[]'
+    if: needs.changes.outputs.functions != '[]'
     strategy:
       matrix:
-        project: ${{ fromJSON(needs.changes.outputs.projects) }}
+        function: ${{ fromJSON(needs.changes.outputs.functions) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "node.jsならビルドするよー ${{ matrix.project }}"
-        if: ${{ hashFiles(format('{0}/{1}', matrix.project, 'package.json')) != '' }}
-        working-directory: ${{ matrix.project }}
-      - run: echo "デプロイするよー ${{ matrix.project }}"
+      - run: echo "node.jsならビルドするよー ${{ matrix.function }}"
+        if: ${{ hashFiles(format('{0}/{1}', matrix.function, 'package.json')) != '' }}
+        working-directory: ${{ matrix.function }}
+      - run: echo "デプロイするよー ${{ matrix.function }}"
