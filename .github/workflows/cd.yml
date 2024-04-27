@@ -1,6 +1,9 @@
 name: Dynamic Workflow
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   dynamic-changes:
@@ -23,7 +26,6 @@ jobs:
         run: |
           projects="$( echo $changed | jq -r '.[]' | cut -d'/' -f2 | sort | uniq | jq -s -R -c 'split("\n") | map(select(. != ""))' )"
           echo "projects=${projects}" >> $GITHUB_OUTPUT
-          cat $GITHUB_OUTPUT
 
   dynamic-build:
     environment:
