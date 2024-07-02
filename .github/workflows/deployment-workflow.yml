@@ -11,14 +11,17 @@ jobs:
       functions: ${{ steps.changes.outputs.functions }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - name: "チェックアウト"
+        uses: actions/checkout@v4
+      - name: "パス毎の差分チェックする"
+        uses: dorny/paths-filter@v3
         id: filter
         with:
           list-files: json
           filters: |
             changed: 'lambda/*/**'
-      - id: changes
+      - name: "動的ビルドマトリクス作成する"
+        id: changes
         env:
           changed: ${{ steps.filter.outputs.changed_files }}
         run: |
@@ -33,8 +36,11 @@ jobs:
         function: ${{ fromJSON(needs.changes.outputs.functions) }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: echo "node.jsならビルドするよー ${{ matrix.function }}"
+      - name: "チェックアウト"
+        uses: actions/checkout@v4
+      - name: "ビルド"
+        run: echo "node.jsならビルドするよー ${{ matrix.function }}"
         if: ${{ hashFiles(format('{0}/{1}', matrix.function, 'package.json')) != '' }}
         working-directory: ${{ matrix.function }}
-      - run: echo "デプロイするよー ${{ matrix.function }}"
+      - name: "デプロイ"
+        run: echo "デプロイするよー ${{ matrix.function }}"
