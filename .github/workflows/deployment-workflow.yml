@@ -18,7 +18,7 @@ jobs:
         id: filter
         with:
           list-files: json
-          base: other-branch-test
+          base: ${{ github.ref_name }}
           filters: |
             changed: 'lambda/*/**'
       - name: "動的ビルドマトリクス作成する"
